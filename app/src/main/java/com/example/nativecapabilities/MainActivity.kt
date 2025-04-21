@@ -26,7 +26,10 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
         val butnext = findViewById<Button>(R.id.button4);
         val butpre = findViewById<Button>(R.id.button5);
         val seek = findViewById<SeekBar>(R.id.Seekbar1);
+        seek.max = media.duration;
+
         seek.setOnSeekBarChangeListener(this)
+
 
 
 
