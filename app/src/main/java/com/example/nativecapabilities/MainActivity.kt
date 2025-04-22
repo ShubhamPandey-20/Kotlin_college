@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnSeekCompleteListener
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ComponentActivity
 import com.example.nativecapabilities.ui.theme.NativecapabilitiesTheme
@@ -15,10 +18,14 @@ import com.example.nativecapabilities.ui.theme.NativecapabilitiesTheme
 class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
     var songs =  arrayOf(R.raw.song1, R.raw.song3, R.raw.song4, R.raw.song5);
     var current = 0;
+    lateinit var media:MediaPlayer
+
+
     @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var media = MediaPlayer.create(applicationContext, songs[current])
+         media = MediaPlayer.create(applicationContext, songs[current])
+
         setContentView(R.layout.layout)
         val butplay = findViewById<Button>(R.id.button);
         val butPause= findViewById<Button>(R.id.button2);
@@ -26,9 +33,21 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
         val butnext = findViewById<Button>(R.id.button4);
         val butpre = findViewById<Button>(R.id.button5);
         val seek = findViewById<SeekBar>(R.id.Seekbar1);
+        val tv1 = findViewById<TextView>(R.id.textView);
+        val tv2 = findViewById<TextView>(R.id.textView2);
+
         seek.max = media.duration;
 
         seek.setOnSeekBarChangeListener(this)
+        val handler = Handler()
+        handler.postDelayed(object :Runnable {
+            override fun run(){
+                seek.progress = media.currentPosition
+                handler.postDelayed(this, 1)
+            }
+
+
+        }, 0)
 
 
 
@@ -37,12 +56,12 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
         butplay.setOnClickListener {
             if(media.isPlaying){
                 media.pause();
-                butplay.setText("Resume")
+               butplay.setText("Resume")
 
             }
             else {
                 media.start();
-                butplay.setText("Pause")
+               butplay.setText("Pause")
             }
 
 
@@ -52,7 +71,7 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
 //
 //        }
         butstop.setOnClickListener {
-            butplay.setText("Play")
+           butplay.setText("Play")
             media.stop();
             media.prepare()
         }
@@ -67,7 +86,9 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
                current = 0;
            }
            media = MediaPlayer.create(applicationContext , songs[current]);
+           seek.progress = 0
            media.start();
+           seek.max=media.duration
        }
         butpre.setOnClickListener {
             current--;
@@ -79,6 +100,8 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
 
             media = MediaPlayer.create(applicationContext , songs[current]);
             media.start();
+            seek.progress = 0
+            seek.max=media.duration
 
         }
 
@@ -97,6 +120,10 @@ class MainActivity : ComponentActivity(), OnSeekBarChangeListener {
     }
 
     override fun onStopTrackingTouch(p0: SeekBar) {
-        Toast.makeText(applicationContext , ""  +p0.progress, Toast.LENGTH_LONG).show();
+        media.seekTo(p0.progress)
+
+
+
+       Toast.makeText(applicationContext , ""  +p0.progress, Toast.LENGTH_LONG).show();
     }
 }
